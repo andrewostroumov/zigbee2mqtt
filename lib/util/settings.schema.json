@@ -19,6 +19,7 @@
     "external_converters": {
       "type": "array",
       "title": "External converters",
+      "description": "You can define external converters to e.g. add support for a DiY device",
       "requiresRestart": true,
       "items": {
         "type": "string"
@@ -27,7 +28,7 @@
     },
     "mqtt": {
       "type": "object",
-      "title": "MQTT settings",
+      "title": "MQTT",
       "properties": {
         "base_topic": {
           "type": "string",
@@ -61,12 +62,13 @@
           "type": "string",
           "title": "SSL/TLS key",
           "requiresRestart": true,
-          "description": "Absolute paths to SSL/TLS key and certificate for client-authentication",
+          "description": "Absolute path to SSL/TLS key for client-authentication",
           "examples": ["/etc/ssl/mqtt-client.key"]
         },
         "cert": {
           "type": "string",
           "title": "SSL/TLS certificate",
+          "description": "Absolute path to SSL/TLS certificate for client-authentication",
           "requiresRestart": true,
           "examples": ["/etc/ssl/mqtt-client.crt"]
         },
@@ -109,7 +111,8 @@
           "title": "Version",
           "requiresRestart": true,
           "description": "MQTT protocol version",
-          "default": 4
+          "default": 4,
+          "examples": [4, 5]
         },
         "force_disable_retain": {
           "type": "boolean",
@@ -123,7 +126,7 @@
     },
     "serial": {
       "type": "object",
-      "title": "Serial settings",
+      "title": "Serial",
       "properties": {
         "port": {
           "type": ["string", "null"],
@@ -186,13 +189,13 @@
     },
     "experimental": {
       "type": "object",
-      "title": "Experimental options",
+      "title": "Experimental",
       "properties": {
         "transmit_power": {
           "type": ["number", "null"],
           "title": "Transmit power",
           "requiresRestart": true,
-          "description": "Transmit power of adapter, only available for Z-Stack (CC253*/CC2652/CC1352) adapters"
+          "description": "Transmit power of adapter, only available for Z-Stack (CC253*/CC2652/CC1352) adapters, CC2652 = 5dbm, CC1352 max is = 20dbm (5dbm default)"
         },
         "output": {
           "type": "string",
@@ -204,7 +207,7 @@
     },
     "advanced": {
       "type": "object",
-      "title": "Advanced settings",
+      "title": "Advanced",
       "properties": {
         "legacy_api": {
           "type": "boolean",
@@ -243,7 +246,8 @@
           "default": 11,
           "title": "ZigBee channel",
           "requiresRestart": true,
-          "description": "Zigbee channel, changing requires repairing all devices! (Note: use a ZLL channel: 11, 15, 20, or 25 to avoid Problems)"
+          "description": "Zigbee channel, changing requires repairing all devices! (Note: use a ZLL channel: 11, 15, 20, or 25 to avoid Problems)",
+          "examples": [11, 15, 20, 25]
         },
         "cache_state": {
           "type": "boolean",
@@ -253,14 +257,14 @@
         },
         "cache_state_persistent": {
           "type": "boolean",
-          "title": "Chache state persistent",
+          "title": "Persist cache state",
           "description": "Persist cached state, only used when cache_state: true",
           "default": true
         },
         "cache_state_send_on_startup": {
           "type": "boolean",
-          "title": "Cache state send on startup",
-          "description": "Cache state send on startup, only used when cache_state: true",
+          "title": "Send cached state on startup",
+          "description": "Send cached state on startup, only used when cache_state: true",
           "default": true
         },
         "log_rotation": {
@@ -407,12 +411,14 @@
         "homeassistant_discovery_topic": {
           "type": "string",
           "title": "Homeassistant discovery topic",
+          "description": "Home Assistant discovery topic",
           "requiresRestart": true,
           "examples": ["homeassistant"]
         },
         "homeassistant_status_topic": {
           "type": "string",
           "title": "Home Assistant status topic",
+          "description": "Home Assistant status topic",
           "requiresRestart": true,
           "examples": ["homeassistant/status"]
         },
@@ -432,13 +438,98 @@
         "adapter_delay": {
           "type": ["number", "null"],
           "requiresRestart": true,
-          "title": "Adapter delay"
+          "title": "Adapter delay",
+          "description": "Adapter delay"
+        },
+        "ikea_ota_use_test_url": {
+          "type": "boolean",
+          "title": "IKEA TRADFRI OTA use test url",
+          "requiresRestart": true,
+          "description": "Use IKEA TRADFRI OTA test server, see OTA updates documentation",
+          "default": false
+        },
+        "homeassistant_legacy_triggers": {
+          "type": "boolean",
+          "title": "Home Assistant legacy triggers",
+          "description": "Home Assistant legacy triggers, when enabled Zigbee2mqt will send an empty 'action' or 'click' after one has been send. A 'sensor_action' and 'sensor_click' will be discoverd",
+          "default": true
+        },
+        "log_syslog": {
+          "type": "object",
+          "title": "syslog",
+          "properties": {
+            "host": {
+              "type": "string",
+              "title": "Host",
+              "description": "The host running syslogd, defaults to localhost.",
+              "default": "localhost"
+            },
+            "port": {
+              "type": "number",
+              "title": "Port",
+              "description": "The port on the host that syslog is running on, defaults to syslogd's default port.",
+              "default": 123
+            },
+            "protocol": {
+              "type": "string",
+              "title": "Protocol",
+              "description": "The network protocol to log over (e.g. tcp4, udp4, tls4, unix, unix-connect, etc).",
+              "default": "tcp4",
+              "examples": [
+                "tcp4",
+                "udp4",
+                "tls4",
+                "unix",
+                "unix-connect"
+              ]
+            },
+            "path": {
+              "type": "string",
+              "title": "Path",
+              "description": "The path to the syslog dgram socket (i.e. /dev/log or /var/run/syslog for OS X).",
+              "default": "/dev/log",
+              "examples": [
+                "/dev/log",
+                "/var/run/syslog"
+              ]
+            },
+            "pid": {
+              "type": "string",
+              "title": "PID",
+              "description": "PID of the process that log messages are coming from (Default process.pid).",
+              "default": "process.pid"
+            },
+            "localhost": {
+              "type": "string",
+              "title": "Localhost",
+              "description": "Host to indicate that log messages are coming from (Default: localhost).",
+              "default": "localhost"
+            },
+            "type": {
+              "type": "string",
+              "title": "Type",
+              "description": "The type of the syslog protocol to use (Default: BSD, also valid: 5424).",
+              "default": "5424"
+            },
+            "app_name": {
+              "type": "string",
+              "title": "Localhost",
+              "description": "The name of the application (Default: Zigbee2MQTT).",
+              "default": "Zigbee2MQTT"
+            },
+            "eol": {
+              "type": "string",
+              "title": "eol",
+              "description": "The end of line character to be added to the end of the message (Default: Message without modifications).",
+              "default": "/n"
+            }
+          }
         }
       }
     },
     "map_options": {
       "type": "object",
-      "title": "Networkmap options",
+      "title": "Networkmap",
       "properties": {
         "graphviz": {
           "type": "object",
@@ -491,6 +582,24 @@
         }
       }
     },
+    "ota": {
+      "type": "object",
+      "title": "OTA updates",
+      "properties": {
+        "update_check_interval": {
+          "type": "number",
+          "title": "Update check interval",
+          "description": "Your device may request a check for a new firmware update. This value determines how frequently third party servers may actually be contacted to look for firmware updates. The value is set in minutes, and the default is 10.",
+          "default": 10
+        },
+        "disable_automatic_update_check": {
+          "type": "boolean",
+          "title": "Disable automatic update check",
+          "description": "Zigbee devices may request a firmware update, and do so frequently, causing Zigbee2MQTT to reach out to third party servers. If you disable these device initiated checks, you can still initiate a firmware update check manually.",
+          "default": false
+        }
+      }
+    },
     "devices": {
       "type": "object",
       "propertyNames": {
@@ -510,6 +619,32 @@
       "patternProperties": {
         "^.*$": {
           "$ref": "#/definitions/group"
+        }
+      }
+    },
+    "frontend": {
+      "type": "object",
+      "title": "Frontend",
+      "properties": {
+        "port": {
+          "type": "number",
+          "title": "Port",
+          "description": "Frontend binding port",
+          "default": 8080,
+          "requiresRestart": true
+        },
+        "host": {
+          "type": "string",
+          "title": "Bind host",
+          "description": "Frontend binding host",
+          "default":" 0.0.0.0",
+          "requiresRestart": true
+        },
+        "auth_token": {
+          "type": ["string", "null"],
+          "title": "Auth token",
+          "description": "Enables authentication, disabled by default",
+          "requiresRestart": true
         }
       }
     }
